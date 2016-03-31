@@ -42,10 +42,10 @@ class WebGraph:
         for item in edgelist:
             self.add_edge(item[0], item[1])
     
-    def adjacency_list(self, label1):
-        self.add_node(label1)
-        url_split = urllib.parse.urlsplit(label1)
-        shtml = urllib.request.urlopen(label1).read()
+    def link_discovery(self, url):
+        self.add_node(url)
+        url_split = urllib.parse.urlsplit(url)
+        shtml = urllib.request.urlopen(url).read()
         soup = BeautifulSoup(shtml)
         links = soup.find_all('a')
         
@@ -53,9 +53,9 @@ class WebGraph:
         for link in links:
             hreftarget = link.get('href')
             if hreftarget != '':
-                normalized_url = urllib.parse.urljoin(label1, hreftarget)
-                self.add_edge(label1, normalized_url)
-        return self.graph[label1]
+                normalized_url = urllib.parse.urljoin(url, hreftarget)
+                self.add_edge(url, normalized_url)
+        return self.graph[url]
     
     def bfs(self, starting_node, max_nodes_visited=None):
         queue = MyQueue()
@@ -66,7 +66,7 @@ class WebGraph:
         if count > 0:
             while not queue.isempty():
                 v = queue.pop()
-                url_links = self.adjacency_list(v)
+                url_links = self.link_discovery(v)
                 for link in url_links:
                     if link not in visited.values():
                         visited[starting_node].append(link)
