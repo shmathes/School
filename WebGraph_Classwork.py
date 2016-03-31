@@ -42,6 +42,7 @@ class WebGraph:
         for item in edgelist:
             self.add_edge(item[0], item[1])
     
+	#Parses a given url and finds all links associated with that url. Returns them in a {node:[edge]} form.
     def link_discovery(self, url):
         self.add_node(url)
         url_split = urllib.parse.urlsplit(url)
@@ -51,10 +52,13 @@ class WebGraph:
         
         root_netloc = url_split.netloc
         for link in links:
-            hreftarget = link.get('href')
-            if hreftarget != '':
-                normalized_url = urllib.parse.urljoin(url, hreftarget)
-                self.add_edge(url, normalized_url)
+            split_result = urllib.parse.urlsplit(link.get('href'))
+            if split_result.netloc == '':
+                url_to_visit = root_netloc + '/' + split_result.path
+                self.add_edge(url, url_to_visit)
+            else:
+                url_to_visit = link.get('href')
+                self.add_edge(url, url_to_visit)
         return self.graph[url]
     
     def bfs(self, starting_node, max_nodes_visited=None):
