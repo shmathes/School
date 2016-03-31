@@ -67,20 +67,20 @@ class WebGraph:
         visited = {}
         visited[starting_node] = list()
         count = max_nodes_visited
-		if count is None:
-			pass
-		else:
-			if count > 0:
-				while not queue.isempty():
-					v = queue.pop()
-					url_links = self.link_discovery(v)
-					for link in url_links:
-						if link not in visited.values():
-							visited[starting_node].append(link)
-							queue.push(link)
-					count -= 1
-					if count == 0:
-						break
+	if count is None:
+		pass
+	else:
+		if count > 0:
+			while not queue.isempty():
+				v = queue.pop()
+				url_links = self.link_discovery(v)
+				for link in url_links:
+					if link not in visited.values():
+						visited[starting_node].append(link)
+						queue.push(link)
+				count -= 1
+				if count == 0:
+					break
         return visited
 
 
