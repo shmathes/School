@@ -42,23 +42,17 @@ class WebGraph:
         for item in edgelist:
             self.add_edge(item[0], item[1])
     
-	#Parses a given url and finds all links associated with that url. Returns them in a {node:[edge]} form.
     def link_discovery(self, url):
         self.add_node(url)
         url_split = urllib.parse.urlsplit(url)
         shtml = urllib.request.urlopen(url).read()
         soup = BeautifulSoup(shtml)
         links = soup.find_all('a')
-        
-        root_netloc = url_split.netloc
+
         for link in links:
-            split_result = urllib.parse.urlsplit(link.get('href'))
-            if split_result.netloc == '':
-                url_to_visit = root_netloc + '/' + split_result.path
-                self.add_edge(url, url_to_visit)
-            else:
-                url_to_visit = link.get('href')
-                self.add_edge(url, url_to_visit)
+            if 'href' in link.attrs:
+                discovered_url = link.get('href')
+                self.add_edge(url, discovered_url)
         return self.graph[url]
     
     def bfs(self, starting_node, max_nodes_visited=None):
@@ -67,54 +61,24 @@ class WebGraph:
         visited = {}
         visited[starting_node] = list()
         count = max_nodes_visited
-	if count is None:
-		pass
-	else:
-		if count > 0:
-			while not queue.isempty():
-				v = queue.pop()
-				url_links = self.link_discovery(v)
-				for link in url_links:
-					if link not in visited.values():
-						visited[starting_node].append(link)
-						queue.push(link)
-				count -= 1
-				if count == 0:
-					break
+		if count is None:
+			pass
+		else:
+			while count > 0:
+				while not queue.isempty():
+					v = queue.pop()
+					url_links = self.link_discovery(v)
+					for link in url_links:
+						if link not in visited.values():
+							visited[v].append(link)
+							queue.push(link)
+					count -= 1
+					if count == 0:
+						break
         return visited
 
 
-# In[405]:
 
-g = WebGraph()
-
-
-# In[406]:
-
-url = 'http://ius.edu'
-
-
-# In[407]:
-
-url1 = 'https://ada.ius.edu/~cjkimmer/teaching/i427.html'
-
-
-# In[408]:
-
-print(g.bfs(url1, 1))
-
-
-# In[409]:
-
-print(g.graph)
-
-
-# In[410]:
-
-print(len(g.graph.keys()))
-
-
-# In[ ]:
 
 
 
